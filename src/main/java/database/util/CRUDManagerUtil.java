@@ -6,7 +6,9 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class CRUDManagerUtil {
     private CRUDManagerUtil() {
@@ -38,6 +40,10 @@ public class CRUDManagerUtil {
 
                             if (declaredField.getType() == LocalDate.class) {
                                 declaredFieldValue = res.getDate(i + 1).toLocalDate(); // i + 1 car on commence a 1 mais pas a 0
+                            } else if (declaredField.getType() == LocalDateTime.class) {
+                                declaredFieldValue = res.getTimestamp(i + 1).toLocalDateTime();
+                            } else if (declaredField.getType() == LocalTime.class) {
+                                declaredFieldValue = res.getTime(i + 1).toLocalTime();
                             } else if (declaredField.getType() == Double.TYPE) {
                                 declaredFieldValue = res.getDouble(i + 1);
                             } else if (declaredField.getType() == Integer.TYPE) {

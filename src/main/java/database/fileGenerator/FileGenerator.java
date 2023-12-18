@@ -110,6 +110,12 @@ public class FileGenerator {
             if (types.contains("LocalDate")) {
                 fileContent += "import java.time.LocalDate;\n";
             }
+            if (types.contains("LocalDateTime")) {
+                fileContent += "import java.time.LocalDateTime;\n";
+            }
+            if (types.contains("LocalTime")) {
+                fileContent += "import java.time.LocalTime;\n";
+            }
             
             fileContent += "\n";
 
