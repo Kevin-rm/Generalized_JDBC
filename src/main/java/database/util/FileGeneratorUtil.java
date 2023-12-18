@@ -118,6 +118,10 @@ public class FileGeneratorUtil {
             valiny = "String";
         } else if (type.equals("date")) {
             valiny = "LocalDate";
+        } else if (type.equals("timestamp")) {
+            valiny = "LocalDateTime";
+        } else if (type.equals("time")) {
+            valiny = "LocalTime";
         }
 
         return valiny;
