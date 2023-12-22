@@ -36,7 +36,8 @@ public class DbConnector {
         } else { // Securisation au cas ou le SGBD est different des 3 bases reconnues par le programme
             throw new IllegalArgumentException("Soit faute de frappe sur le SGDB, soit celui qui a été saisi n'est pas reconnu par ce programme");
         }
-
+        
+        valiny.setAutoCommit(false);
         return valiny;
     }
 }

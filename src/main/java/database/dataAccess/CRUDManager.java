@@ -82,18 +82,14 @@ public class CRUDManager {
             stmt = con.createStatement();
             stmt.executeUpdate(query);
 
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) { // On a besoin de commit sur oracle
-                con.commit();
-            }
+            con.commit();
 
             stmt.close();
             if (conWasNull) {
                 con.close();
             }
         } catch (SQLException e) {
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) {
-                con.rollback();
-            }
+            con.rollback();
             
             throw new SQLException("\nSQLException dans CRUDManager.insert: " + e.getMessage());
         }
@@ -122,18 +118,14 @@ public class CRUDManager {
             stmt = con.createStatement();
             stmt.executeUpdate(query);
 
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) { // On a besoin de commit sur oracle
-                con.commit();
-            }
+            con.commit();
 
             stmt.close();
             if (conWasNull) {
                 con.close();
             }
         } catch (SQLException e) {
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) {
-                con.rollback();
-            }
+            con.rollback();
             
             throw new SQLException("\nSQLException dans CRUDManager.update: " + e.getMessage());
         }
@@ -162,18 +154,14 @@ public class CRUDManager {
             stmt = con.createStatement();
             stmt.executeUpdate(query);
 
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) { // On a besoin de commit sur oracle
-                con.commit();
-            }
+            con.commit();
 
             stmt.close();
             if (conWasNull) {
                 con.close();
             }
         } catch (SQLException e) {
-            if (sgbd.compareToIgnoreCase("Oracle") == 0) {
-                con.rollback();
-            }
+            con.rollback();
             
             throw new SQLException("\nSQLException dans CRUDManager.delete: " + e.getMessage());
         }
