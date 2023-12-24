@@ -17,7 +17,7 @@ public class ClasseDAOImpl implements ClasseDAO {
 	 */
 
 	@Override
-	public Classe[] getAllClasses(Connection con) throws Exception {
+	public Classe[] getAll(Connection con) throws Exception {
 		Table sqlTable = Classe.class.getAnnotation(Table.class);
 		if (sqlTable == null) {
 			throw new Exception("Annotation absente pour la classe " + Classe.class.getName());

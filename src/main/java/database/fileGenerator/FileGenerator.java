@@ -174,36 +174,71 @@ public class FileGenerator {
         }
     }
     
-    // Genere une interface DAO pour une table donnee
-    public static void generateDAOInterface(String tableName) throws Exception {
-        String className = FileGeneratorUtil.convertToPascalCase(tableName);
-        String interfaceName = className + "DAO";
-
-        String interfaceContent = new String();
-        
-        interfaceContent += "package model.dao;\n\n";
-        
-        interfaceContent += "import java.sql.Connection;\n";
-        interfaceContent += "import model.table." + className + ";\n\n";
-        
-        interfaceContent += "public interface " + interfaceName + " {\n";
-        
-        interfaceContent += "\t/* Ci-dessous sont des methodes basiques de CRUD */\n\n";
-        interfaceContent += "\t" + className + "[] getAll" + className + "s(Connection con) throws Exception;\n\n";
-        interfaceContent += "\tvoid insert(Connection con," + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n\n";
-        interfaceContent += "\tvoid update(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n\n";
-        interfaceContent += "\tvoid delete(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n";
-        
-        interfaceContent += "}\n";
-        
+    // Genere l'interface DAO generique
+    public static void generateGenericDAOInterface() throws IOException {
+        String interfaceName = "DAO";
         String packageName = "model.dao";
+        
+        String fileContent = "package " + packageName + ";\n\n";
+        fileContent += "import java.sql.Connection;\n\n";
+        
+        fileContent += "public interface " + interfaceName + "<T> {\n";
+        
+        fileContent += "\t/* Ci-dessous sont des methodes basiques de CRUD */\n\n";
+        fileContent += "\tT[] getAll(Connection con) throws Exception;\n\n";
+        fileContent += "\tvoid insert(Connection con, T t) throws Exception;\n\n";
+        fileContent += "\tvoid update(Connection con, T t) throws Exception;\n\n";
+        fileContent += "\tvoid delete(Connection con, T t) throws Exception;\n";
+        
+        fileContent += "}\n";
+        
         FileGeneratorUtil.createDirectories(packageName);
-               
         String filePath = FileGeneratorUtil.getPackagePath(packageName) + File.separator + interfaceName + ".java";
 
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
-            bufferedWriter.write(interfaceContent);
+            bufferedWriter.write(fileContent);
+            
+            bufferedWriter.close();
+            
+            System.out.println("Interface DAO générée avec succès");
+        } catch (IOException e) {
+            throw new IOException("\nIOException dans FileGenerator.generateGenericDAOInterface: " + e.getMessage());
+        }
+    }
+    
+    // Genere une interface DAO pour une table donnee et celle-ci va extends l'interface DAO generique
+    public static void generateDAOInterface(String tableName) throws IOException {
+        String className = FileGeneratorUtil.convertToPascalCase(tableName);
+        String interfaceName = className + "DAO";
+        String packageName = "model.dao";
+
+        String fileContent = new String();
+        
+        fileContent += "package " + packageName + ";\n\n";
+        
+        fileContent += "import java.sql.Connection;\n";
+        fileContent += "import model.table." + className + ";\n\n";
+        
+        fileContent += "public interface " + interfaceName + " extends DAO<" + className + "> {\n";
+        
+        fileContent += "\t@Override\n";
+        fileContent += "\t" + className + "[] getAll(Connection con) throws Exception;\n\n";
+        fileContent += "\t@Override\n";
+        fileContent += "\tvoid insert(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n\n";
+        fileContent += "\t@Override\n";
+        fileContent += "\tvoid update(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n\n";
+        fileContent += "\t@Override\n";
+        fileContent += "\tvoid delete(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception;\n";
+        
+        fileContent += "}\n";
+        
+        FileGeneratorUtil.createDirectories(packageName);
+        String filePath = FileGeneratorUtil.getPackagePath(packageName) + File.separator + interfaceName + ".java";
+
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
+            bufferedWriter.write(fileContent);
             
             bufferedWriter.close();
             
@@ -214,14 +249,15 @@ public class FileGenerator {
     }
     
     // Genere une classe qui va implementer son interface DAO respectif pour une table donnee
-    public static void generateDAOImplementationClass(String sgbd, String tableName) throws Exception {
+    public static void generateDAOImplementationClass(String sgbd, String tableName) throws IOException {
         String className = FileGeneratorUtil.convertToPascalCase(tableName);
         String interfaceName = className + "DAO";
         String interfaceImplClassName = interfaceName + "Impl";
+        String packageName = "model.daoImpl";
 
         String fileContent = new String();
         
-        fileContent += "package model.daoImpl;\n\n";
+        fileContent += "package " + packageName + ";\n\n";
         
         fileContent += "import database.annotation.Table;\n";
         fileContent += "import database.dataAccess.CRUDManager;\n";
@@ -243,7 +279,7 @@ public class FileGenerator {
         /* ------------------- */
         
         fileContent += "\t@Override\n";
-        fileContent += "\tpublic " + className + "[] getAll" + className + "s(Connection con) throws Exception {\n";
+        fileContent += "\tpublic " + className + "[] getAll(Connection con) throws Exception {\n";
         /* Code auto-generated pour le select */
         fileContent += "\t\tTable sqlTable = " + className + ".class.getAnnotation(Table.class);\n";
         fileContent += "\t\tif (sqlTable == null) {\n";
@@ -277,9 +313,7 @@ public class FileGenerator {
         
         fileContent += "}\n";
         
-        String packageName = "model.daoImpl";
-        FileGeneratorUtil.createDirectories(packageName);
-               
+        FileGeneratorUtil.createDirectories(packageName);       
         String filePath = FileGeneratorUtil.getPackagePath(packageName) + File.separator + interfaceImplClassName + ".java";
 
         try {
@@ -293,25 +327,88 @@ public class FileGenerator {
             throw new IOException("\nIOException dans FileGenerator.generateDAOImplemenatation: " + e.getMessage());
         }
     }
+    
+    public static void generateServiceClass(String tableName) throws IOException {
+        String className = FileGeneratorUtil.convertToPascalCase(tableName);
+        String interfaceName = className + "DAO";
+        String interfaceImplClassName = interfaceName + "Impl";
+        String serviceName = className + "Service";
+        String packageName = "model.service";
+
+        String fileContent = new String();
+        
+        fileContent += "package " + packageName + ";\n\n";
+        
+        fileContent += "import java.sql.Connection;\n";
+        fileContent += "import model.table." + className + ";\n";
+        fileContent += "import model.dao." + interfaceName + ";\n";
+        fileContent += "import model.daoImpl." + interfaceImplClassName + ";\n\n";
+        
+        fileContent += "public class " + serviceName + " {\n";
+        
+        String fieldName = interfaceName.substring(0, 1).toLowerCase() + interfaceName.substring(1);
+        /* Attribut */
+        fileContent += "\tprivate static " + interfaceName + " " + fieldName + " = " + "new " + interfaceImplClassName + "();\n\n";
+        /* -------- */
+        
+        fileContent += "\tpublic static " + className + "[] getAll(Connection con) throws Exception {\n";
+        fileContent += "\t\treturn " + serviceName + "." + fieldName + ".getAll(con);\n";
+        fileContent += "\t}\n\n";
+
+        fileContent += "\tpublic void insert(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception {\n";
+        fileContent += "\t\t" + serviceName + "." + fieldName + ".insert(con, " + FileGeneratorUtil.convertToCamelCase(tableName) + ");\n";
+        fileContent += "\t}\n\n";
+        
+        fileContent += "\tpublic void update(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception {\n";
+        fileContent += "\t\t" + serviceName + "." + fieldName + ".update(con, " + FileGeneratorUtil.convertToCamelCase(tableName) + ");\n";
+        fileContent += "\t}\n\n";
+        
+        fileContent += "\tpublic void delete(Connection con, " + className + " " + FileGeneratorUtil.convertToCamelCase(tableName) + ") throws Exception {\n";
+        fileContent += "\t\t" + serviceName + "." + fieldName + ".delete(con, " + FileGeneratorUtil.convertToCamelCase(tableName) + ");\n";
+        fileContent += "\t}\n";
+        
+        fileContent += "}\n";
+        
+        FileGeneratorUtil.createDirectories(packageName);       
+        String filePath = FileGeneratorUtil.getPackagePath(packageName) + File.separator + serviceName + ".java";
+
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
+            bufferedWriter.write(fileContent);
+            
+            bufferedWriter.close();
+            
+            System.out.println("Fichier " + serviceName + ".java générée avec succès");
+        } catch (IOException e) {
+            throw new IOException("\nIOException dans FileGenerator.generateServiceClass: " + e.getMessage());
+        }
+    }
 
     /*
      * Fonctionnalites:
      * - Transforme toutes les tables presentes dans la base de donnees en fichier .java
+     * - Genere une classe DAO generique
      * - Genere les DAO specifiques pour chaque classe generee
-     * - Implement ces interfaces DAO
+     * - Implemente ces interfaces DAO
+     * - Genere une couche service pour chaque implementation DAO
      */
     public static void generateModelClassesFromDbTables(String sgbd) throws Exception {
         Connection con = DbConnector.getConnection(sgbd);
         DatabaseMetaData databaseMetaData = con.getMetaData();
         
         String[] allTables = FileGeneratorUtil.getAllTables(sgbd, FileGenerator.project, databaseMetaData);
+        
+        // Genere la classe DAO generique
+        FileGenerator.generateGenericDAOInterface();
         for (String table : allTables) {
             // Par defaut, toutes les classes generees ont comme package: "model.table"
             FileGenerator.SQLTableToJava(sgbd, con, databaseMetaData, "model.table", table);
             // Les DAO sont dans le package "model.dao"
             FileGenerator.generateDAOInterface(table);
-            // Les implementations des DAO quant a eux sont dans "model.daoImpl"
+            // Les implementations des DAO dans "model.daoImpl"
             FileGenerator.generateDAOImplementationClass(sgbd, table);
+            // Les services quant a eux sont dans "model.service"
+            FileGenerator.generateServiceClass(table);
         }
 
         con.close();

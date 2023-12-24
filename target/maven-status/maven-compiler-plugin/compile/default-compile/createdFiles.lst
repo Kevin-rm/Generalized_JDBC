@@ -1,11 +1,8 @@
-model\daoImpl\ClasseDAOImpl.class
 database\connection\DbConnector.class
 database\connection\MysqlConnector.class
 database\dataAccess\CRUDManager.class
 database\util\CRUDManagerUtil.class
-model\dao\EtudiantDAO.class
 main\Main.class
-model\table\Etudiant.class
 database\util\FileGeneratorUtil.class
 database\fileGenerator\FileGenerator.class
 database\annotation\Table.class
@@ -14,6 +11,3 @@ database\connection\OracleConnector.class
 database\connection\PostgresConnector.class
 database\annotation\Column.class
 database\util\DatabaseProperties.class
-model\dao\ClasseDAO.class
-model\daoImpl\EtudiantDAOImpl.class
-model\table\Classe.class
