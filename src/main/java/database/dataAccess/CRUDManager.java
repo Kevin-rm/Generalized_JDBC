@@ -2,8 +2,8 @@ package database.dataAccess;
 
 import database.connection.DbConnector;
 import database.util.CRUDManagerUtil;
-import database.util.QueryConstructor;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -75,16 +75,13 @@ public class CRUDManager {
             con = DbConnector.getConnection(sgbd); // Genere une exception
         }
 
-        Statement stmt = null;
-        String query = QueryConstructor.getInsertQuery(sgbd, object);
-
         try {
-            stmt = con.createStatement();
-            stmt.executeUpdate(query);
+            PreparedStatement preparedStatement = CRUDManagerUtil.getInsertPreparedStatement(con, object);
+            preparedStatement.executeUpdate();
 
             con.commit();
 
-            stmt.close();
+            preparedStatement.close();
             if (conWasNull) {
                 con.close();
             }
@@ -111,16 +108,13 @@ public class CRUDManager {
             con = DbConnector.getConnection(sgbd); // Genere une exception
         }
 
-        Statement stmt = null;
-        String query = QueryConstructor.getUpdateQuery(sgbd, object);
-
         try {
-            stmt = con.createStatement();
-            stmt.executeUpdate(query);
+            PreparedStatement preparedStatement = CRUDManagerUtil.getUpdatePreparedStatement(con, object);
+            preparedStatement.executeUpdate();
 
             con.commit();
 
-            stmt.close();
+            preparedStatement.close();
             if (conWasNull) {
                 con.close();
             }
@@ -147,16 +141,13 @@ public class CRUDManager {
             con = DbConnector.getConnection(sgbd); // Genere une exception
         }
 
-        Statement stmt = null;
-        String query = QueryConstructor.getDeleteQuery(object);
-
         try {
-            stmt = con.createStatement();
-            stmt.executeUpdate(query);
+            PreparedStatement preparedStatement = CRUDManagerUtil.getDeletePreparedStatement(con, object);
+            preparedStatement.executeUpdate();
 
             con.commit();
 
-            stmt.close();
+            preparedStatement.close();
             if (conWasNull) {
                 con.close();
             }
